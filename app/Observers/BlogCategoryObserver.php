@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class BlogCategoryObserver
 {
-    /***
+    /**
      * Handle the BlogCategory "created" event.
      *
      * @param  \App\Models\BlogCategory  $blogCategory
