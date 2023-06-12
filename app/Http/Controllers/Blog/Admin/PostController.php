@@ -147,7 +147,6 @@ class PostController extends BaseController
      */
     public function destroy($id)
     {
-        BlogPostAfterDeleteJob::dispatch($id)->delay(20);
         $result = BlogPost::destroy($id); //софт деліт, запис лишається
 
         //$result = BlogPost::find($id)->forceDelete(); //повне видалення з БД
