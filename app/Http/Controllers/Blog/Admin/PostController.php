@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\BlogPostAfterCreateJob;
 use App\Jobs\BlogPostAfterDeleteJob;
+use Illuminate\Support\Facades\Bus;
 
 class PostController extends BaseController
 {
@@ -29,6 +30,7 @@ class PostController extends BaseController
         $this->blogPostRepository = app(BlogPostRepository::class); //app вертає об'єкт класа
         $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +60,7 @@ class PostController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(BlogPostCreateRequest $request)
@@ -83,7 +85,7 @@ class PostController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -94,7 +96,7 @@ class PostController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -111,8 +113,8 @@ class PostController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(BlogPostUpdateRequest $request, $id)
@@ -142,17 +144,17 @@ class PostController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $result = BlogPost::destroy($id); //софт деліт, запис лишається
+        $result = BlogPost::destroy($id);//софт деліт, запис лишається
 
         //$result = BlogPost::find($id)->forceDelete(); //повне видалення з БД
 
         if ($result) {
-            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
+            Bus::dispatch(new BlogPostAfterDeleteJob($id))->delay(20);
             return redirect()
                 ->route('blog.admin.posts.index')
                 ->with(['success' => "Запис id[$id] видалено"]);
